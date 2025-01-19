@@ -1,15 +1,21 @@
 from pyspark.sql import SparkSession
+#Setting a spar session
+spark = SparkSession.builder.appName("PythonWordCount") \
+    .master("spark://spark-master:7077") \
+    .config("spark.executor.memory", "2g") \
+    .config("spark.driver.memory", "2g") \
+    .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer") \
+    .config("spark.executor.heartbeatInterval", "60s") \
+    .config("spark.network.timeout", "300s") \
+    .getOrCreate()
 
-spark = SparkSession.builder.appName("PythonWordCount").getOrCreate()
+text = "Hello Spark Hello Python Hello Airflow Hello Docker and Hello Yusuf"
 
-text = "Hello Spark, Hello python, and docker"
+words = spark.sparkContext.parallelize(text.split(" "))
 
-words = spark.sparkContext.parallelize(text.split(","))
+wordCounts = words.map(lambda word: (word, 1)).reduceByKey(lambda a, b: a + b)
 
-# Sumamos las ocurrencias de cada palabra lambda key, value
-wordsCounts = words.map( lambda word: (word,1)).reduceByKey(lambda a, b: a + b)
-
-for countWords in wordsCounts.collect():
-    print(countWords[0], countWords[1])
-
+results = wordCounts.collect()
+for word, count in results:
+    print(f"{word}: {count}")
 spark.stop()

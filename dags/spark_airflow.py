@@ -22,11 +22,11 @@ start_task = PythonOperator(
 ##The Apache Airflow SparkSubmitOperator is an operator that allows users to run Spark jobs within Airflow DAGs
 python_job = SparkSubmitOperator(
     task_id="python_job",
-    conn_id="spark_conn", ##SPARK_CONECTION ID
+    conn_id="spark-conn",
     application="jobs/python/wordcountjob.py",
-    name="SparkApp",
     dag=dag
 )
+
 
 end_task = PythonOperator(
     task_id= "end_task",
